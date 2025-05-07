@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import RoadmapDisplay from '../../components/RoadmapDisplay';
 import Step1Form from '../../components/forms/Step1Form';
 import Step2DealAnalysis from '../../components/forms/Step2DealAnalysis';
-import { AuthContext } from '../../context/AuthContext';
+import { AuthContext } from '../context/AuthContext';
 import apiClient from '../../services/apiClient';
 import { loadStripe, StripeElementsOptions } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
