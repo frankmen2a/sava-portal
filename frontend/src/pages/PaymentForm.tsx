@@ -73,6 +73,8 @@ const CheckoutForm = () => {
             return;
         }
 
+        console.log("Client Secret in handleSubmit before check:", clientSecret);
+
         if (!clientSecret) {
             setError('Payment cannot be processed: Missing client secret. Please refresh and try again.');
             setProcessing(false);
