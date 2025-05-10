@@ -28,23 +28,37 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     const [user, setUser] = useState<User | null>(null);
     const [isLoading, setIsLoading] = useState(true);
 
-    useEffect(() => {
-        try {
-            const storedToken = localStorage.getItem('authToken');
-            const storedUser = localStorage.getItem('authUser');
-            if (storedToken && storedUser) {
-                const parsedUser = JSON.parse(storedUser);
-                // TODO: Add token validation logic here
-                setToken(storedToken);
-                setUser(parsedUser);
-            }
-        } catch (error) {
-            console.error("Failed to load auth state from local storage:", error);
-            localStorage.removeItem('authToken');
-            localStorage.removeItem('authUser');
+    // Inside AuthProvider component in AuthContext.tsx
+
+useEffect(() => {
+    console.log("AuthContext: useEffect - Checking localStorage...");
+    try {
+        const storedToken = localStorage.getItem('authToken');
+        const storedUserJson = localStorage.getItem('authUser');
+        // Log exactly what is retrieved from localStorage
+        console.log("AuthContext: useEffect - storedToken from localStorage:", storedToken);
+        console.log("AuthContext: useEffect - storedUserJson from localStorage:", storedUserJson);
+
+        if (storedToken && storedUserJson) {
+            console.log("AuthContext: useEffect - Found token and user JSON in localStorage. Parsing user JSON...");
+            const parsedUser = JSON.parse(storedUserJson);
+            // TODO: Add token validation logic here (important for security later)
+            setToken(storedToken);
+            setUser(parsedUser);
+            console.log("AuthContext: useEffect - Successfully set token and user from localStorage. User:", JSON.stringify(parsedUser, null, 2));
+        } else {
+            console.log("AuthContext: useEffect - Token and/or user JSON NOT found in localStorage.");
         }
-        setIsLoading(false);
-    }, []);
+    } catch (error) {
+        console.error("AuthContext: useEffect - Failed to load or parse auth state from localStorage:", error);
+        // Attempt to clear potentially corrupted items
+        localStorage.removeItem('authToken');
+        localStorage.removeItem('authUser');
+        console.log("AuthContext: useEffect - Cleared authToken and authUser from localStorage due to error.");
+    }
+    setIsLoading(false);
+    console.log("AuthContext: useEffect - setIsLoading(false) has been called.");
+}, []); // Empty dependency array means this runs once on mount
 
     const login = useCallback((newToken: string, userData: User) => {
         try {
