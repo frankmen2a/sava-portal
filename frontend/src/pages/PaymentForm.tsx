@@ -140,8 +140,7 @@ const CheckoutForm = () => {
     };
 
     return (
-        <form id="payment-form" onSubmit={handleSubmit} style={{ maxWidth: '500px', margin: '40px auto', padding: '30px', border: '1px solid #ccc
-', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+        <form id="payment-form" onSubmit={handleSubmit} style={{ maxWidth: '500px', margin: '40px auto', padding: '30px', border: '1px solid #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9'}}>
             <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Complete Your Payment</h2>
             <div style={{ marginBottom: '15px' }}>
                 <label htmlFor="card-element" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
