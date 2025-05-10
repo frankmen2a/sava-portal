@@ -238,9 +238,10 @@ def create_payment(current_user_data):
             }
         )
         logging.info(f"PaymentIntent created successfully for user_id: {user_id}, Intent ID: {intent.id}")
-        return jsonify({
-            "clientSecret": intent.client_secret
-        })
+        client_secret_value = intent.client_secret
+        response_data = {"clientSecret": client_secret_value}
+        logging.info(f"Attempting to return JSON for user_id {user_id}: {response_data}")
+        return jsonify(response_data)
     except stripe.error.StripeError as e:
         logging.error(f"Stripe API error creating PaymentIntent for user_id {user_id}: {e}", exc_info=True)
         status_code = getattr(e, 'http_status', 500)
@@ -353,4 +354,3 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5003))
     # Debug should be False in production
     app.run(host="0.0.0.0", port=port, debug=False)
-
