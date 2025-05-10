@@ -1,13 +1,6 @@
 import React from 'react';
-import { loadStripe } from '@stripe/stripe-js';
-import { Elements } from '@stripe/react-stripe-js';
-import StripePaymentForm from '../components/StripePaymentForm'; // Assuming StripePaymentForm.tsx is in src/components/
-
-// Load Stripe with your publishable key. 
-// IMPORTANT: Replace with your ACTUAL Stripe Publishable Key. It should be a string.
-// It's best practice to load this from an environment variable.
-const STRIPE_PUBLISHABLE_KEY = "pk_test_YOUR_STRIPE_PUBLISHABLE_KEY"; // Replace this placeholder
-const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
+// Assuming PaymentForm.tsx (which exports StripePaymentForm) is in the same 'pages' directory
+import StripePaymentForm from './PaymentForm'; 
 
 const PaymentPage: React.FC = () => {
   console.log("PaymentPage component is rendering."); // For debugging
@@ -19,9 +12,7 @@ const PaymentPage: React.FC = () => {
         <p className="text-center text-gray-600">Please enter your payment details below to activate your account ($100 setup fee).</p>
         
         {/* 
-          The StripePaymentForm component (which I provided earlier and you saved as PaymentForm.tsx or StripePaymentForm.tsx)
-          already includes the <Elements> provider and the CheckoutForm logic within it.
-          You just need to render StripePaymentForm here.
+          StripePaymentForm should handle the Stripe Elements provider and logic internally.
         */}
         <StripePaymentForm />
 
