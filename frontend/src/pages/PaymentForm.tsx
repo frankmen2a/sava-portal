@@ -18,7 +18,13 @@ const CheckoutForm = () => {
     const [paymentMessage, setPaymentMessage] = useState('');
 
     useEffect(() => {
+
+         console.log("CheckoutForm useEffect hook is running.");
+        
         const fetchClientSecret = async () => {
+
+            console.log("fetchClientSecret function was called.");
+            
             const token = localStorage.getItem('authToken');
             if (!token) {
                 setPaymentMessage('Authentication token not found. Please log in.');
