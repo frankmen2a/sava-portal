@@ -237,11 +237,8 @@ def create_payment(current_user_data):
                 "email": email
             }
         )
-        logging.info(f"PaymentIntent created successfully for user_id: {user_id}, Intent ID: {intent.id}")
-        client_secret_value = intent.client_secret
-        response_data = {"clientSecret": client_secret_value}
-        logging.info(f"Attempting to return JSON for user_id {user_id}: {response_data}")
-        return jsonify(response_data)
+        logging.info(f"Attempting to return simple text for user_id {user_id}")
+        return "This is a test response from /api/create-payment-intent", 200
     except stripe.error.StripeError as e:
         logging.error(f"Stripe API error creating PaymentIntent for user_id {user_id}: {e}", exc_info=True)
         status_code = getattr(e, 'http_status', 500)
