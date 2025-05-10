@@ -4,63 +4,75 @@ import { Elements, CardElement, useStripe, useElements } from '@stripe/react-str
 
 // --- IMPORTANT: Replace with your ACTUAL Stripe Publishable Key ---
 // Ensure this key is a string and is your correct publishable key.
-const STRIPE_PUBLISHABLE_KEY = "pk_live_51PNP5ZDl2XsLNeAgMwaapn11vfeHyPj9FDRLsudJ3FNPSAHVZq0yg3zKS16s1jAt69W2Jt7HdAFPO5pWAf5Eb1Zp00x8GRdd1C";
+const STRIPE_PUBLISHABLE_KEY = "pk_live_51PNP5ZDl2XsLNeAgMwaapn11vfeHyPj9FDRLsudJ3FNPSAHVZq0yg3zKS16s1jAt69W2Jt7HdAFPO5pWAf5Eb1Zp00x8GRdd1C"; // User's key, keep it
 
 const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
 const CheckoutForm = () => {
     const stripe = useStripe();
     const elements = useElements();
-    const [error, setError] = useState<string | null>(null); // Added type for error state
+    const [error, setError] = useState<string | null>(null);
     const [processing, setProcessing] = useState(false);
     const [succeeded, setSucceeded] = useState(false);
     const [clientSecret, setClientSecret] = useState('');
     const [paymentMessage, setPaymentMessage] = useState('');
 
     useEffect(() => {
+        console.log("CheckoutForm useEffect hook is running.");
 
-         console.log("CheckoutForm useEffect hook is running.");
-        
         const fetchClientSecret = async () => {
-
             console.log("fetchClientSecret function was called.");
-            
-            const token = localStorage.getItem('authToken');
+            const token = localStorage.getItem("authToken");
+            console.log("Auth Token from localStorage:", token);
+
             if (!token) {
-                setPaymentMessage('Authentication token not found. Please log in.');
-                setError('Authentication token not found. Please log in.');
+                console.log("No auth token found, returning early from fetchClientSecret.");
+                setPaymentMessage("Authentication token not found. Please log in.");
+                setError("Authentication token not found. Please log in.");
                 return;
             }
 
+            console.log("Auth token found, proceeding to fetch client secret.");
             try {
-                const response = await fetch('/api/create-payment-intent', {
-                    method: 'POST',
+                console.log("Attempting to fetch /api/create-payment-intent");
+                const response = await fetch("/api/create-payment-intent", {
+                    method: "POST",
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${token}`,
+                        "Content-Type": "application/json",
+                        "Authorization": `Bearer ${token}`,
                     },
                 });
 
-                const data = await response.json();
-                if (response.ok && data.clientSecret) {
-                    setClientSecret(data.clientSecret);
-                } else {
-                    const errorMsg = data.error || 'Failed to initialize payment. Please try again.';
-                    setError(errorMsg);
-                    setPaymentMessage(errorMsg);
-                    console.error('Failed to fetch client secret:', data);
+                const responseText = await response.text();
+                console.log("Raw response from /api/create-payment-intent:", responseText);
+
+                try {
+                    const data = JSON.parse(responseText);
+                    if (response.ok && data.clientSecret) {
+                        setClientSecret(data.clientSecret);
+                    } else {
+                        const errorMsg = data.error || 'Failed to initialize payment. Server response not OK or clientSecret missing.';
+                        setError(errorMsg);
+                        setPaymentMessage(errorMsg);
+                        console.error('Failed to fetch client secret (parsed data):', data);
+                    }
+                } catch (parseError) {
+                    console.error('Error parsing JSON response:', parseError, 'Raw response was:', responseText);
+                    setError('Received an invalid response from the server.');
+                    setPaymentMessage('Received an invalid response from the server.');
                 }
-            } catch (err) {
-                console.error('Error fetching client secret:', err);
-                setError('Could not connect to payment server. Please try again later.');
-                setPaymentMessage('Could not connect to payment server. Please try again later.');
+
+            } catch (networkErr) {
+                console.error('Network error fetching client secret:', networkErr);
+                setError('Could not connect to payment server. Please check your network connection and try again later.');
+                setPaymentMessage('Could not connect to payment server. Please check your network connection and try again later.');
             }
         };
 
         fetchClientSecret();
     }, []);
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => { // Added type for event
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
         event.preventDefault();
         setProcessing(true);
         setError(null);
@@ -73,7 +85,7 @@ const CheckoutForm = () => {
         }
 
         const cardElement = elements.getElement(CardElement);
-        if (!cardElement) { // Added a check for cardElement
+        if (!cardElement) {
             setError('Card element not found. Please ensure Stripe Elements are correctly mounted.');
             setProcessing(false);
             return;
@@ -98,7 +110,7 @@ const CheckoutForm = () => {
             setError(stripeError.message || 'An unexpected error occurred during payment.');
             setPaymentMessage(stripeError.message || 'An unexpected error occurred during payment.');
             setProcessing(false);
-        } else if (paymentIntent) { // Added check for paymentIntent
+        } else if (paymentIntent) {
             if (paymentIntent.status === 'succeeded') {
                 setSucceeded(true);
                 setPaymentMessage('Payment successful! Your account should be activated shortly.');
@@ -128,7 +140,8 @@ const CheckoutForm = () => {
     };
 
     return (
-        <form id="payment-form" onSubmit={handleSubmit} style={{ maxWidth: '500px', margin: '40px auto', padding: '30px', border: '1px solid #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+        <form id="payment-form" onSubmit={handleSubmit} style={{ maxWidth: '500px', margin: '40px auto', padding: '30px', border: '1px solid #ccc
+', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
             <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Complete Your Payment</h2>
             <div style={{ marginBottom: '15px' }}>
                 <label htmlFor="card-element" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
@@ -137,7 +150,8 @@ const CheckoutForm = () => {
                 <CardElement id="card-element" options={cardElementOptions} />
             </div>
             
-            {error && <div id="card-errors" role="alert" style={{ color: 'red', marginTop: '10px', fontSize: '0.9em', textAlign: 'center' }}>{error}</div>}
+            {error && <div id="card-errors" role="alert" style={{ color: 'red', marginTop: '10px', fontSize: '0.9em', textAlign: 'center'
+ }}>{error}</div>}
             {paymentMessage && <div id="payment-message" style={{ marginTop: '20px', textAlign: 'center', fontWeight: 'bold', color: succeeded ? 'green' : 'red' }}>{paymentMessage}</div>}
 
             <button 
@@ -170,6 +184,8 @@ const CheckoutForm = () => {
 };
 
 const StripePaymentForm = () => {
+    // This console.log is to ensure StripePaymentForm itself is rendering.
+    console.log("StripePaymentForm component is rendering (wrapper for Elements)."); 
     return (
         <Elements stripe={stripePromise}>
             <CheckoutForm />
@@ -178,5 +194,3 @@ const StripePaymentForm = () => {
 };
 
 export default StripePaymentForm;
-
-
