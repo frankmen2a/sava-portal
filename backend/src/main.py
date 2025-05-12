@@ -354,3 +354,13 @@ if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5003))
     # Debug should be False in production
     app.run(host="0.0.0.0", port=port, debug=False)
+
+
+
+# --- Simple Test Route --- #
+@app.route("/api/test", methods=["GET"])
+def test_route():
+    logging.info("Accessed /api/test route")
+    return jsonify({"message": "It worked!"}), 200
+
+# --- Static file serving --- #
