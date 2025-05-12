@@ -34,8 +34,8 @@ const CheckoutForm = () => {
 
             console.log("Auth token found, proceeding to fetch client secret.");
             try {
-                console.log("Attempting to fetch /api/create-payment-intent");
-                const response = await fetch("/api/create-payment-intent", {
+                console.log("Attempting to fetch /api/generate-payment-secret");
+                const response = await fetch("/api/generate-payment-secret", {
                     method: "POST",
                     headers: {
                         "Content-Type": "application/json",
@@ -44,7 +44,7 @@ const CheckoutForm = () => {
                 });
 
                 const responseText = await response.text();
-                console.log("Raw response from /api/create-payment-intent:", responseText);
+                console.log("Raw response from /api/generate-payment-secret:", responseText);
 
                 try {
                     const data = JSON.parse(responseText);
