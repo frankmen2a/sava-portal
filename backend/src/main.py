@@ -377,4 +377,24 @@ def test_post_route():
     
     return jsonify({"message": "POST request worked!", "received_data": data}), 200
 
+@app.route("/api/test-auth", methods=["POST"])
+@token_required
+def test_auth_route(current_user_data):
+    user_id = current_user_data.get("user_id")
+    logging.info(f"Accessed /api/test-auth route with authenticated user_id: {user_id}")
+    # Log the request details to help with debugging
+    logging.info(f"Request headers: {dict(request.headers)}")
+    try:
+        data = request.get_json()
+        logging.info(f"Request JSON data: {data}")
+    except Exception as e:
+        logging.error(f"Error parsing JSON data: {e}")
+        data = None
+    
+    return jsonify({
+        "message": "Authenticated POST request worked!",
+        "user_id": user_id,
+        "received_data": data
+    }), 200
+
 # --- Static file serving --- #
