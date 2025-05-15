@@ -341,11 +341,11 @@ def get_user_profile(current_user_data):
 @app.route("/<path:path>")
 def serve(path):
     if not path.startswith("api/") and not path.startswith("auth/"):
+        # This is a simplified catch-all for non-API routes.
+        # In a real app, you might serve index.html or handle static files differently.
         return jsonify({"message": "API server is running. Access frontend via its development server or static host."}), 200
     else:
         # Let Flask handle 404 for non-matched API/auth routes
-        return jsonify({"error": "API endpoint not found"}), 404 # Explicitly return 404
-        
         pass
 
 if __name__ == "__main__":
@@ -357,10 +357,24 @@ if __name__ == "__main__":
 
 
 
-# --- Simple Test Route --- #
+# --- Simple Test Routes --- #
 @app.route("/api/test", methods=["GET"])
 def test_route():
     logging.info("Accessed /api/test route")
     return jsonify({"message": "It worked!"}), 200
+
+@app.route("/api/test-post", methods=["POST"])
+def test_post_route():
+    logging.info("Accessed /api/test-post route")
+    # Log the request details to help with debugging
+    logging.info(f"Request headers: {dict(request.headers)}")
+    try:
+        data = request.get_json()
+        logging.info(f"Request JSON data: {data}")
+    except Exception as e:
+        logging.error(f"Error parsing JSON data: {e}")
+        data = None
+    
+    return jsonify({"message": "POST request worked!", "received_data": data}), 200
 
 # --- Static file serving --- #
