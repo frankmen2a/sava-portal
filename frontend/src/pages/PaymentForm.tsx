@@ -1,6 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { loadStripe } from '@stripe/stripe-js';
-import { Elements, CardElement, useStripe, useElements } from '@stripe/react-stripe-js';
+import { 
+  Elements, 
+  CardElement, 
+  useStripe, 
+  useElements
+} from '@stripe/react-stripe-js';
 
 // --- IMPORTANT: Replace with your ACTUAL Stripe Publishable Key ---
 // Ensure this key is a string and is your correct publishable key.
@@ -8,19 +13,39 @@ const STRIPE_PUBLISHABLE_KEY = "pk_live_51PNP5ZDl2XsLNeAgMwaapn11vfeHyPj9FDRLsud
 
 const stripePromise = loadStripe(STRIPE_PUBLISHABLE_KEY);
 
-const CheckoutForm = () => {
+// Define types for the CardElement options
+interface CardElementOptions {
+  style: {
+    base: {
+      color: string;
+      fontFamily: string;
+      fontSmoothing: string;
+      fontSize: string;
+      "::placeholder": {
+        color: string;
+      };
+    };
+    invalid: {
+      color: string;
+      iconColor: string;
+    };
+  };
+  hidePostalCode?: boolean;
+}
+
+const CheckoutForm: React.FC = () => {
     const stripe = useStripe();
     const elements = useElements();
     const [error, setError] = useState<string | null>(null);
-    const [processing, setProcessing] = useState(false);
-    const [succeeded, setSucceeded] = useState(false);
-    const [clientSecret, setClientSecret] = useState('');
-    const [paymentMessage, setPaymentMessage] = useState('');
+    const [processing, setProcessing] = useState<boolean>(false);
+    const [succeeded, setSucceeded] = useState<boolean>(false);
+    const [clientSecret, setClientSecret] = useState<string>('');
+    const [paymentMessage, setPaymentMessage] = useState<string>('');
 
     useEffect(() => {
         console.log("CheckoutForm useEffect hook is running.");
 
-        const fetchClientSecret = async () => {
+        const fetchClientSecret = async (): Promise<void> => {
             console.log("fetchClientSecret function was called.");
             const token = localStorage.getItem("authToken");
             console.log("Auth Token from localStorage:", token);
@@ -72,7 +97,7 @@ const CheckoutForm = () => {
         fetchClientSecret();
     }, []);
 
-    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    const handleSubmit = async (event: React.FormEvent<HTMLFormElement>): Promise<void> => {
         event.preventDefault();
         setProcessing(true);
         setError(null);
@@ -121,7 +146,7 @@ const CheckoutForm = () => {
         }
     };
 
-    const cardElementOptions = {
+    const cardElementOptions: CardElementOptions = {
         style: {
             base: {
                 color: "#32325d",
@@ -136,26 +161,41 @@ const CheckoutForm = () => {
                 color: "#fa755a",
                 iconColor: "#fa755a"
             }
-        }
+        },
+        // Optional: Add built-in labels for better accessibility
+        hidePostalCode: true
     };
 
     return (
         <form id="payment-form" onSubmit={handleSubmit} style={{ maxWidth: '500px', margin: '40px auto', padding: '30px', border: '1px solid #ccc', borderRadius: '8px', backgroundColor: '#f9f9f9'}}>
             <h2 style={{ textAlign: 'center', marginBottom: '20px' }}>Complete Your Payment</h2>
+            
+            {/* Improved accessibility for CardElement */}
             <div style={{ marginBottom: '15px' }}>
-                <label htmlFor="card-element" style={{ display: 'block', marginBottom: '5px', fontWeight: 'bold' }}>
+                {/* Use aria-labelledby instead of htmlFor */}
+                <div id="card-label" style={{ marginBottom: '5px', fontWeight: 'bold' }}>
                     Credit or debit card
-                </label>
-                <CardElement id="card-element" options={cardElementOptions} />
+                </div>
+                <div 
+                    role="group" 
+                    aria-labelledby="card-label"
+                    className="card-element-container"
+                >
+                    <CardElement 
+                        options={cardElementOptions} 
+                        aria-label="Credit or debit card input"
+                    />
+                </div>
             </div>
             
-            {error && <div id="card-errors" role="alert" style={{ color: 'red', marginTop: '10px', fontSize: '0.9em', textAlign: 'center'
- }}>{error}</div>}
+            {error && <div id="card-errors" role="alert" style={{ color: 'red', marginTop: '10px', fontSize: '0.9em', textAlign: 'center' }}>{error}</div>}
             {paymentMessage && <div id="payment-message" style={{ marginTop: '20px', textAlign: 'center', fontWeight: 'bold', color: succeeded ? 'green' : 'red' }}>{paymentMessage}</div>}
 
             <button 
                 disabled={processing || !stripe || !clientSecret || succeeded}
                 id="submit-button"
+                type="submit"
+                aria-label="Submit payment"
                 style={{
                     backgroundColor: (processing || !stripe || !clientSecret || succeeded) ? '#ccc' : '#6772e5',
                     color: 'white',
@@ -182,7 +222,7 @@ const CheckoutForm = () => {
     );
 };
 
-const StripePaymentForm = () => {
+const StripePaymentForm: React.FC = () => {
     // This console.log is to ensure StripePaymentForm itself is rendering.
     console.log("StripePaymentForm component is rendering (wrapper for Elements)."); 
     return (
