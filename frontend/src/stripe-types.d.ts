@@ -13,7 +13,6 @@ declare module '@stripe/react-stripe-js' {
   export const CardNumberElement: React.FC<any>;
   export const CardExpiryElement: React.FC<any>;
   export const CardCvcElement: React.FC<any>;
-  // PaymentElement is not used in your code, so we can remove it
 
   export function useStripe(): Stripe | null;
   export function useElements(): StripeElements | null;
@@ -21,13 +20,14 @@ declare module '@stripe/react-stripe-js' {
 
 declare module '@stripe/stripe-js' {
   export interface Stripe {
-    confirmCardPayment: (clientSecret: string, data: any) => Promise<any>;
-    // Add this line to fix the confirmPayment error
-    confirmPayment?: (clientSecret: string, data: any) => Promise<any>;
+    confirmCardPayment(clientSecret: string, data: any): Promise<{
+      error?: any;
+      paymentIntent?: any;
+    }>;
   }
 
   export interface StripeElements {
-    getElement: (type: any) => StripeElement | null;
+    getElement(type: any): StripeElement | null;
   }
 
   export interface StripeElement {}
