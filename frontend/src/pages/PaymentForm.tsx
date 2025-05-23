@@ -233,3 +233,4 @@ const StripePaymentForm: React.FC = () => {
 };
 
 export default StripePaymentForm;
+
