@@ -125,11 +125,13 @@ const CheckoutForm: React.FC = () => {
         }
 
         // Using non-null assertion operator to tell TypeScript that stripe is definitely not null here
-        const { error: stripeError, paymentIntent } = await stripe!.confirmCardPayment(clientSecret, {
+        const result = await stripe.confirmCardPayment(clientSecret, {
             payment_method: {
                 card: cardElement,
             },
         });
+
+        const { error: stripeError, paymentIntent } = result;
 
         if (stripeError) {
             console.error('Stripe payment confirmation error:', stripeError);
